@@ -1,0 +1,29 @@
+# ============================================================
+#  Bike Demand Elasticity — FastAPI Backend Requirements
+# ============================================================
+
+# ── Web Framework ─────────────────────────────────────────────
+fastapi==0.111.0
+uvicorn[standard]==0.29.0
+python-multipart==0.0.9          # multipart/form-data (CSV upload)
+
+# ── Database (Async PostgreSQL + SQLAlchemy ORM) ──────────────
+sqlalchemy[asyncio]==2.0.30
+asyncpg==0.29.0                  # async PostgreSQL driver
+alembic==1.13.1                  # database migrations
+
+# ── Configuration ─────────────────────────────────────────────
+python-dotenv==1.0.1
+
+# ── Data / ML ─────────────────────────────────────────────────
+pandas==2.2.2
+numpy==1.26.4
+scikit-learn==1.4.2
+joblib==1.4.2
+
+# ── Pydantic v2 (bundled with FastAPI; explicit pin for safety) ─
+pydantic==2.7.1
+pydantic-settings==2.2.1
+
+# ── HTTP / CORS ───────────────────────────────────────────────
+httpx==0.27.0                    # for async test client

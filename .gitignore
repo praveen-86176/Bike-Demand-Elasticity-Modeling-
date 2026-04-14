@@ -1,0 +1,4 @@
+backend/.env
+saved_models/
+test_db.py
+venv/
