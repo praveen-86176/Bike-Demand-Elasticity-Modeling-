@@ -6,7 +6,7 @@ from sklearn.pipeline import Pipeline
 
 CATEGORICAL_FEATURES = ["season", "weathersit"]
 NUMERICAL_FEATURES   = ["temp", "atemp", "hum", "windspeed"]
-PASSTHROUGH_FEATURES = ["hr", "mnth", "holiday", "workingday", "weekday"]
+PASSTHROUGH_FEATURES = ["hr", "mnth", "holiday", "workingday", "weekday", "yr"]
 
 ALL_FEATURES = CATEGORICAL_FEATURES + NUMERICAL_FEATURES + PASSTHROUGH_FEATURES
 TARGET       = "cnt"
@@ -23,7 +23,7 @@ def load_and_clean(file_bytes: bytes) -> pd.DataFrame:
     df = pd.read_csv(BytesIO(file_bytes))
 
     # Drop columns not needed
-    drop_cols = ["instant", "dteday", "yr", "casual", "registered"]
+    drop_cols = ["instant", "dteday", "casual", "registered"]
     df = df.drop(columns=[c for c in drop_cols if c in df.columns])
 
     # Drop rows with missing target

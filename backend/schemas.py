@@ -14,6 +14,7 @@ class PredictRequest(BaseModel):
     windspeed: float
     mnth: int
     weekday: int
+    yr: int = 1
 
 class PredictResponse(BaseModel):
     predicted_demand: int

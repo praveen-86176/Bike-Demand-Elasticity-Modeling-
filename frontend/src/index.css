@@ -1,50 +1,138 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
   body {
-    @apply bg-background text-gray-200 antialiased font-sans min-h-screen bg-gradient-radial bg-fixed bg-cover;
+    font-family: 'Inter', system-ui, sans-serif;
+    background-color: #0f1117;
+    color: #e2e8f0;
+    -webkit-font-smoothing: antialiased;
+  }
+  input[type=range] {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+    background: #2a2d4a;
+    outline: none;
+    cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #4f6ef7;
+    box-shadow: 0 0 0 3px rgba(79,110,247,0.25);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  input[type=range]::-webkit-slider-thumb:hover {
+    box-shadow: 0 0 0 5px rgba(79,110,247,0.35);
+  }
+  select {
+    -webkit-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    padding-right: 40px !important;
   }
 }
 
 @layer components {
-  .nav-btn {
-    @apply flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-white hover:bg-white/5 transition-all;
+  /* ── Card ── */
+  .bd-card {
+    background: #1e2139;
+    border: 1px solid #2a2d4a;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.3);
   }
-  .nav-btn.active {
-    @apply text-white bg-white/10 ring-1 ring-white/10;
+
+  /* ── Input ── */
+  .bd-input {
+    @apply w-full rounded-lg px-4 py-3 text-sm text-slate-100 outline-none transition-all;
+    background: #0f1117;
+    border: 1px solid #2a2d4a;
   }
-  
-  .glass-card {
-    @apply bg-card/60 backdrop-blur-md rounded-2xl p-8 border border-border shadow-2xl;
+  .bd-input:focus { border-color: #4f6ef7; box-shadow: 0 0 0 3px rgba(79,110,247,0.15); }
+  .bd-input::placeholder { color: #4a5568; }
+
+  /* ── Label ── */
+  .bd-label {
+    @apply block text-xs font-semibold uppercase tracking-wider mb-1.5;
+    color: #94a3b8;
   }
-  
-  .input-label {
-    @apply text-xs font-semibold text-gray-500 uppercase tracking-widest mb-2 block;
+
+  /* ── Primary Button ── */
+  .bd-btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-bold text-white transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed;
+    background: linear-gradient(135deg, #4f6ef7 0%, #7c5cbf 100%);
+    box-shadow: 0 4px 20px rgba(79,110,247,0.35);
   }
-  
-  .input-field {
-    @apply w-full bg-black/20 border border-border rounded-lg px-4 py-3 text-white transition-all focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 appearance-none;
+  .bd-btn:hover:not(:disabled) { box-shadow: 0 6px 28px rgba(79,110,247,0.5); transform: translateY(-1px); }
+  .bd-btn:active:not(:disabled) { transform: translateY(0); }
+
+  /* ── Ghost Button ── */
+  .bd-btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-200;
+    color: #94a3b8;
+    border: 1px solid #2a2d4a;
   }
-  
-  .btn-primary {
-    @apply w-full flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-bold text-white bg-gradient-to-br from-primary to-blue-700 hover:to-blue-600 transition-all shadow-lg shadow-primary/20 hover:shadow-primary/40 disabled:opacity-50 disabled:cursor-not-allowed;
+  .bd-btn-ghost:hover { color: #e2e8f0; border-color: #4f6ef7; background: rgba(79,110,247,0.08); }
+
+  /* ── Sidebar Nav Item ── */
+  .nav-item {
+    @apply flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer;
+    color: #64748b;
   }
+  .nav-item:hover { color: #94a3b8; background: rgba(255,255,255,0.04); }
+  .nav-item.active {
+    color: #e2e8f0;
+    background: rgba(79,110,247,0.15);
+    border-left: 3px solid #4f6ef7;
+  }
+
+  /* ── Badge ── */
+  .bd-badge {
+    @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold;
+  }
+
+  /* ── Toggle ── */
+  .bd-toggle {
+    @apply relative inline-flex items-center cursor-pointer;
+  }
+  .bd-toggle input { @apply sr-only; }
+  .bd-toggle-track {
+    @apply w-11 h-6 rounded-full transition-colors duration-200;
+    background: #2a2d4a;
+  }
+  input:checked ~ .bd-toggle-track { background: #4f6ef7; }
+  .bd-toggle-thumb {
+    @apply absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform duration-200 shadow;
+  }
+  input:checked ~ .bd-toggle-track ~ .bd-toggle-thumb { transform: translateX(20px); }
+
+  /* ── Scrollbar ── */
+  * { scrollbar-width: thin; scrollbar-color: #2a2d4a #0f1117; }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #0f1117; }
+  ::-webkit-scrollbar-thumb { background: #2a2d4a; border-radius: 99px; }
+  ::-webkit-scrollbar-thumb:hover { background: #3d4170; }
+
+  /* ── Animations ── */
+  .fade-in  { animation: fadeIn  0.4s ease-out both; }
+  .slide-up { animation: slideUp 0.4s ease-out both; }
 }
 
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-::-webkit-scrollbar-track {
-  background: theme('colors.background');
-}
-::-webkit-scrollbar-thumb {
-  background: theme('colors.border');
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: theme('colors.gray.600');
-}
+@keyframes fadeIn  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin { animation: spin 1s linear infinite; }
