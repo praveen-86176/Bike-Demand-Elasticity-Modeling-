@@ -12,6 +12,11 @@ if not DATABASE_URL:
         f"@{os.getenv('DB_HOST', 'localhost')}:{os.getenv('DB_PORT', '5432')}/{os.getenv('DB_NAME')}"
     )
 
+# Render (and many cloud providers) give 'postgresql://' by default.
+# SQLAlchemy async engine REQUIRES 'postgresql+asyncpg://' — auto-correct it here.
+if DATABASE_URL.startswith('postgresql://'):
+    DATABASE_URL = DATABASE_URL.replace('postgresql://', 'postgresql+asyncpg://', 1)
+
 engine = create_async_engine(DATABASE_URL, echo=True)
 
 AsyncSessionLocal = sessionmaker(
