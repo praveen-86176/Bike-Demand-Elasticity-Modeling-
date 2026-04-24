@@ -4,8 +4,7 @@
  * Base URL: http://localhost:8000
  */
 
-const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-const BASE = isLocal ? 'http://localhost:8001/api' : '/api';
+const BASE = '/api';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 

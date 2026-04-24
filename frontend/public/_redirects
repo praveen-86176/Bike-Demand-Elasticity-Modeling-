@@ -1,1 +1,5 @@
+# API Proxy
 /api/*  http://3.27.111.205:8000/api/:splat  200
+
+# SPA Routing (Fixes 404 on refresh)
+/*      /index.html  200
