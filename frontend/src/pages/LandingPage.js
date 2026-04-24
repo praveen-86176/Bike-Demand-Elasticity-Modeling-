@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import heroBike from '../hero_bike.png';
 
 import logo from '../logo.png';
@@ -262,7 +262,7 @@ export default function LandingPage() {
         <p style={{ color: 'var(--text-dim)', fontSize: 13 }}>© 2026 ElasticityAI. Bike Demand Elasticity Platform.</p>
         <div style={{ display: 'flex', gap: 24 }}>
           {['Privacy', 'Terms', 'Contact'].map(l => (
-            <a key={l} href="#" style={{ color: 'var(--text-dim)', fontSize: 13, transition: 'color 0.2s' }}
+            <a key={l} href="#!" style={{ color: 'var(--text-dim)', fontSize: 13, transition: 'color 0.2s' }}
               onMouseEnter={e => e.target.style.color = 'var(--text)'}
               onMouseLeave={e => e.target.style.color = 'var(--text-dim)'}
             >{l}</a>
