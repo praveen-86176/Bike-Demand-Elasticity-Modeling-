@@ -243,7 +243,7 @@ export default function Dashboard() {
                       </tr>
                     </thead>
                     <tbody>
-                      {predHistory.slice(0, 8).map(r => (
+                      {(Array.isArray(predHistory) ? predHistory : []).slice(0, 8).map(r => (
                         <tr key={r.id} style={{ background: 'rgba(255,255,255,0.02)', transition: 'background 0.2s' }}>
                           <td style={{ padding: '16px 20px', borderTopLeftRadius: '12px', borderBottomLeftRadius: '12px', fontWeight: '700', color: 'var(--green)' }}>#{r.id}</td>
                           <td style={{ padding: '16px 20px' }}>
@@ -495,14 +495,14 @@ export default function Dashboard() {
           <div style={{ animation: 'fadeIn 0.4s ease' }}>
             <div style={{ marginBottom: '32px' }}>
               <h1 style={{ margin: '0 0 8px', fontSize: '24px', fontWeight: '900' }}>Demand Analytics</h1>
-              <p style={{ margin: 0, color: 'var(--text-dim)', fontSize: '14px' }}>Insights from {predHistory.length} predictions and {runs.length} training runs</p>
+              <p style={{ margin: 0, color: 'var(--text-dim)', fontSize: '14px' }}>Insights from {(Array.isArray(predHistory) ? predHistory : []).length} predictions and {(Array.isArray(runs) ? runs : []).length} training runs</p>
             </div>
 
             {/* Quick Insight Cards */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '28px' }}>
               {[
-                { label: 'Avg Predicted Demand', val: predHistory.length ? Math.round(predHistory.reduce((a, p) => a + (p.predicted_demand || 0), 0) / predHistory.length) : '—', icon: '📊', color: '#7EE63B' },
-                { label: 'Peak Demand Recorded', val: predHistory.length ? Math.max(...predHistory.map(p => p.predicted_demand || 0)).toLocaleString() : '—', icon: '🔺', color: '#FF9800' },
+                { label: 'Avg Predicted Demand', val: (Array.isArray(predHistory) && predHistory.length) ? Math.round(predHistory.reduce((a, p) => a + (p.predicted_demand || 0), 0) / predHistory.length) : '—', icon: '📊', color: '#7EE63B' },
+                { label: 'Peak Demand Recorded', val: (Array.isArray(predHistory) && predHistory.length) ? Math.max(...predHistory.map(p => p.predicted_demand || 0)).toLocaleString() : '—', icon: '🔺', color: '#FF9800' },
                 { label: 'Model Accuracy (Best)', val: stats.best_r2 ? (stats.best_r2 * 100).toFixed(1) + '%' : '—', icon: '🎯', color: '#2196F3' },
               ].map(c => (
                 <div key={c.label} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '16px', padding: '24px' }}>
@@ -526,8 +526,8 @@ export default function Dashboard() {
                     { name: 'Fall', key: 3, color: '#FF5722', pct: 22 },
                     { name: 'Winter', key: 4, color: '#2196F3', pct: 13 },
                   ].map(s => {
-                    const count = predHistory.filter(p => p.input_features?.season === s.key).length;
-                    const barPct = predHistory.length ? (count / predHistory.length * 100) : s.pct;
+                    const count = (Array.isArray(predHistory) ? predHistory : []).filter(p => p.input_features?.season === s.key).length;
+                    const barPct = (Array.isArray(predHistory) && predHistory.length) ? (count / predHistory.length * 100) : s.pct;
                     return (
                       <div key={s.name}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
@@ -552,8 +552,9 @@ export default function Dashboard() {
                     { name: 'Light Rain', key: 3, emoji: '🌧️', pct: 15 },
                     { name: 'Heavy Storm', key: 4, emoji: '⛈️', pct: 5 },
                   ].map(w => {
-                    const count = predHistory.filter(p => p.input_features?.weathersit === w.key).length;
-                    const avg = predHistory.filter(p => p.input_features?.weathersit === w.key).reduce((a, p) => a + (p.predicted_demand || 0), 0) / (count || 1);
+                    const safeHistory = Array.isArray(predHistory) ? predHistory : [];
+                    const count = safeHistory.filter(p => p.input_features?.weathersit === w.key).length;
+                    const avg = safeHistory.filter(p => p.input_features?.weathersit === w.key).reduce((a, p) => a + (p.predicted_demand || 0), 0) / (count || 1);
                     return (
                       <div key={w.name} style={{ display: 'flex', alignItems: 'center', gap: '14px', padding: '10px 14px', background: 'rgba(255,255,255,0.02)', borderRadius: '10px' }}>
                         <span style={{ fontSize: '22px' }}>{w.emoji}</span>
@@ -600,10 +601,11 @@ export default function Dashboard() {
               <p style={{ margin: '0 0 24px', fontSize: '12px', color: 'var(--text-dim)' }}>Average predicted demand per hour from your prediction history</p>
               <div style={{ display: 'flex', alignItems: 'flex-end', gap: '4px', height: '140px' }}>
                 {Array.from({ length: 24 }, (_, hr) => {
-                  const matching = predHistory.filter(p => p.input_features?.hr === hr);
+                  const safeHistory = Array.isArray(predHistory) ? predHistory : [];
+                  const matching = safeHistory.filter(p => p.input_features?.hr === hr);
                   const avg = matching.length ? matching.reduce((a, p) => a + (p.predicted_demand || 0), 0) / matching.length : 0;
                   const maxAvg = Math.max(...Array.from({ length: 24 }, (_, h) => {
-                    const m = predHistory.filter(p => p.input_features?.hr === h);
+                    const m = safeHistory.filter(p => p.input_features?.hr === h);
                     return m.length ? m.reduce((a, p) => a + (p.predicted_demand || 0), 0) / m.length : 0;
                   }), 1);
                   return (

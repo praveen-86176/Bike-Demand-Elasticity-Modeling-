@@ -4,7 +4,7 @@
  * Base URL: http://localhost:8000
  */
 
-const BASE = 'http://localhost:8001';
+const BASE = process.env.REACT_APP_API_BASE || '/api';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -28,7 +28,12 @@ async function request(method, path, body) {
   if (body) opts.body = JSON.stringify(body);
 
   const res = await fetch(`${BASE}${path}`, opts);
-  const data = await res.json().catch(() => ({}));
+  let data;
+  try {
+    data = await res.json();
+  } catch (e) {
+    data = res.ok ? {} : { detail: 'Invalid JSON response from server' };
+  }
 
   if (!res.ok) {
     throw new Error(data.detail || `HTTP ${res.status}`);
