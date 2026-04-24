@@ -1,52 +1,48 @@
-# 🚀 AWS Deployment Guide: ElasticityAI (Barebone EC2)
+# 🚀 AWS Deployment Guide: ElasticityAI Backend ONLY
 
-This guide walks you through deploying **ElasticityAI** on an **AWS EC2 (Free Tier)** instance using Ubuntu, without Docker.
+This guide walks you through deploying the **ElasticityAI Backend API** on an **AWS EC2 (Free Tier)** instance using Ubuntu.
 
 ---
 
 ## 🏗️ 1. AWS EC2 Instance Setup
 
 1.  **Launch Instance**: Go to AWS Console > EC2 > Launch Instance.
-2.  **Name**: `ElasticityAI-Server`
-3.  **OS**: `Ubuntu 24.04 LTS` (64-bit x86).
-4.  **Instance Type**: `t2.micro` or `t3.micro` (Free Tier Eligible).
-5.  **Key Pair**: Create or select an existing `.pem` key.
-6.  **Security Group**:
+2.  **Name**: `ElasticityAI-API-Server`
+3.  **OS**: `Ubuntu 24.04 LTS`.
+4.  **Instance Type**: `t2.micro` or `t3.micro`.
+5.  **Security Group**:
     *   Allow **SSH** (22) from your IP.
-    *   Allow **HTTP** (80) from anywhere.
-    *   Allow **HTTPS** (443) from anywhere.
-    *   Allow **Custom TCP** (8001) from anywhere (for the Backend API).
+    *   Allow **Custom TCP** (8001) from anywhere (This is where your API will live).
 
 ---
 
 ## 🛠️ 2. Server Preparation
 
-Connect to your instance via SSH:
+Connect to your instance:
 ```bash
 ssh -i "your-key.pem" ubuntu@your-ec2-public-ip
 ```
 
-Update system packages:
+Install requirements:
 ```bash
 sudo apt update && sudo apt upgrade -y
-sudo apt install -y python3-pip python3-venv nginx git postgresql postgresql-contrib
+sudo apt install -y python3-pip python3-venv git postgresql postgresql-contrib
 ```
 
 ---
 
 ## 💾 3. PostgreSQL Database Setup
 
-1.  **Switch to postgres user**:
-    ```bash
-    sudo -u postgres psql
-    ```
-2.  **Create Database & User**:
-    ```sql
-    CREATE USER bikeuser WITH PASSWORD 'bike1234';
-    CREATE DATABASE bikedb OWNER bikeuser;
-    GRANT ALL PRIVILEGES ON DATABASE bikedb TO bikeuser;
-    \q
-    ```
+```bash
+sudo -u postgres psql
+```
+In the SQL prompt:
+```sql
+CREATE USER bikeuser WITH PASSWORD 'bike1234';
+CREATE DATABASE bikedb OWNER bikeuser;
+GRANT ALL PRIVILEGES ON DATABASE bikedb TO bikeuser;
+\q
+```
 
 ---
 
@@ -67,20 +63,20 @@ sudo apt install -y python3-pip python3-venv nginx git postgresql postgresql-con
     ```
 
 3.  **Configure Environment Variables**:
-    Create a `.env` file in the root directory:
+    Create a `.env` file in the root:
     ```bash
     nano .env
     ```
-    Paste the following (adjust if needed):
+    Paste the following (replace the secret key with your own):
     ```properties
     DATABASE_URL=postgresql+asyncpg://bikeuser:bike1234@localhost:5432/bikedb
-    SECRET_KEY=your_super_secret_key_here
+    SECRET_KEY=eb6d17f66f7e1350db12f58bd6e8fc872b15367cd20086e2b62b0f29b4d12997
     ALGORITHM=HS256
     ACCESS_TOKEN_EXPIRE_MINUTES=1440
+    MODEL_DIR=./models
     ```
 
 4.  **Create Systemd Service**:
-    This ensures the backend restarts automatically if the server reboots.
     ```bash
     sudo nano /etc/systemd/system/elasticity-api.service
     ```
@@ -109,74 +105,27 @@ sudo apt install -y python3-pip python3-venv nginx git postgresql postgresql-con
 
 ---
 
-## 🎨 5. Frontend Deployment (React)
+## 🔗 5. Connecting your Frontend
 
-1.  **Install Node.js**:
-    ```bash
-    curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-    sudo apt install -y nodejs
-    ```
+Since your frontend is staying local or elsewhere, you just need to point it to the AWS IP.
 
-2.  **Configure API URL**:
-    Edit `frontend/src/api.js` to point to your EC2 Public IP:
-    ```bash
-    nano frontend/src/api.js
-    ```
-    Update the `BASE_URL`:
+1.  Open `frontend/src/api.js` on your computer.
+2.  Update the `BASE_URL`:
     ```javascript
-    const BASE_URL = "http://YOUR_EC2_PUBLIC_IP:8001";
+    const BASE_URL = "http://YOUR_AWS_EC2_PUBLIC_IP:8001";
     ```
-
-3.  **Build the Project**:
-    ```bash
-    cd frontend
-    npm install
-    npm run build
-    ```
-
-4.  **Configure Nginx**:
-    ```bash
-    sudo nano /etc/nginx/sites-available/elasticity-ai
-    ```
-    Paste this (replace `YOUR_EC2_PUBLIC_IP`):
-    ```nginx
-    server {
-        listen 80;
-        server_name YOUR_EC2_PUBLIC_IP;
-
-        location / {
-            root /home/ubuntu/Bike-Demand-Elasticity-Modeling-/frontend/build;
-            index index.html;
-            try_files $uri /index.html;
-        }
-
-        # Proxy API requests to backend
-        location /api/ {
-            proxy_pass http://localhost:8001/;
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-        }
-    }
-    ```
-
-5.  **Enable & Restart Nginx**:
-    ```bash
-    sudo ln -s /etc/nginx/sites-available/elasticity-ai /etc/nginx/sites-enabled
-    sudo nginx -t
-    sudo systemctl restart nginx
-    ```
+3.  Restart your local React app (`npm start`).
 
 ---
 
 ## ✅ 6. Final Verification
 
-1.  Open your browser and go to `http://YOUR_EC2_PUBLIC_IP`.
-2.  Your landing page should appear.
-3.  Test the **Sign Up** and **Predict** features to ensure communication with the backend (port 8001) and DB is working.
+Test your API by visiting:
+👉 `http://YOUR_EC2_PUBLIC_IP:8001/health`
 
-### 💡 Maintenance Commands
-*   **Check API Logs**: `sudo journalctl -u elasticity-api -f`
-*   **Restart API**: `sudo systemctl restart elasticity-api`
-*   **Check Nginx Logs**: `sudo tail -f /var/log/nginx/error.log`
+You should see: `{"status": "ok", "version": "1.0.0"}`.
 
----
+### 💡 Troubleshooting
+*   **Check logs**: `sudo journalctl -u elasticity-api -f`
+*   **Restart**: `sudo systemctl restart elasticity-api`
+*   **Firewall**: Ensure port **8001** is open in your AWS Security Group.
