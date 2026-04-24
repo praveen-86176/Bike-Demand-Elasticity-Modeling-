@@ -4,12 +4,11 @@
  * Base URL: http://localhost:8000
  */
 
-// Runtime environment detection — no env vars, no proxy, no restart needed
 // Local dev → calls backend directly on port 8001
-// Netlify production → uses relative /api path (handled by _redirects proxy)
+// Production → calls Render backend directly (CORS enabled)
 const BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
   ? 'http://localhost:8001/api'
-  : '/api';
+  : 'https://bike-demand-elasticity-modeling.onrender.com/api';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 

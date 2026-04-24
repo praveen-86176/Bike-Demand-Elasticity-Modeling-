@@ -1,5 +1,2 @@
-# API Proxy - Points to your Render Backend
-/api/*  https://bike-demand-elasticity-modeling.onrender.com/api/:splat  200
-
-# SPA Routing - Fixes 404 errors on page refresh
+# SPA Routing - Fixes 404 errors on page refresh (Required for Netlify)
 /*      /index.html  200
