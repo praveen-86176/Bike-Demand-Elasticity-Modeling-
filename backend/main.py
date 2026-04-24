@@ -12,10 +12,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(auth.router,    prefix="/auth",    tags=["Auth"])
-app.include_router(train.router,   prefix="/train",   tags=["Training"])
-app.include_router(predict.router, prefix="/predict", tags=["Prediction"])
-app.include_router(history.router, prefix="/runs",    tags=["History"])
+app.include_router(auth.router,    prefix="/api/auth",    tags=["Auth"])
+app.include_router(train.router,   prefix="/api/train",   tags=["Training"])
+app.include_router(predict.router, prefix="/api/predict", tags=["Prediction"])
+app.include_router(history.router, prefix="/api/runs",    tags=["History"])
 
 
 @app.get("/health")

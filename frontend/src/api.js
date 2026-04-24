@@ -4,7 +4,7 @@
  * Base URL: http://localhost:8000
  */
 
-const BASE = process.env.REACT_APP_API_BASE || '/api';
+const BASE = '/api';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
