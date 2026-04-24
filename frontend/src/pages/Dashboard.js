@@ -438,7 +438,7 @@ export default function Dashboard() {
             </div>
             <div className="table-card">
               <div style={{ padding: '0 16px 16px' }}>
-                {runs.length === 0 ? (
+                {(Array.isArray(runs) ? runs : []).length === 0 ? (
                   <div style={{ padding: '60px 40px', textAlign: 'center' }}>
                     <div style={{ fontSize: '40px', marginBottom: '16px', opacity: 0.5 }}>📋</div>
                     <div style={{ fontSize: '15px', fontWeight: '700', marginBottom: '6px' }}>No Training Runs Yet</div>
@@ -450,7 +450,7 @@ export default function Dashboard() {
                       <tr><th>Run</th><th>Type</th><th>Performance</th><th>Features</th><th>Date</th></tr>
                     </thead>
                     <tbody>
-                      {runs.map((r, i) => {
+                      {(Array.isArray(runs) ? runs : []).map((r, i) => {
                         const r2 = (r.r2_score * 100);
                         const r2Color = r2 >= 90 ? '#7EE63B' : r2 >= 80 ? '#FFB400' : '#ff6b6b';
                         return (
@@ -581,7 +581,7 @@ export default function Dashboard() {
                 <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-dim)' }}>No training runs yet. Train a model to see performance trends.</div>
               ) : (
                 <div style={{ display: 'flex', alignItems: 'flex-end', gap: '6px', height: '180px' }}>
-                  {[...runs].reverse().map((r, i) => {
+                  {Array.isArray(runs) && [...runs].reverse().map((r, i) => {
                     const pct = (r.r2_score || 0) * 100;
                     return (
                       <div key={r.id} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', height: '100%' }}>
