@@ -1,30 +1,27 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import SignIn     from './pages/SignIn';
-import SignUp     from './pages/SignUp';
-import Dashboard  from './pages/Dashboard';
-import TrainModel from './pages/TrainModel';
-import PredictDemand from './pages/PredictDemand';
-import History    from './pages/History';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import LandingPage  from './pages/LandingPage';
+import LoginPage    from './pages/LoginPage';
+import SignupPage   from './pages/SignupPage';
+import Dashboard    from './pages/Dashboard';
+import './index.css';
 
-const ProtectedRoute = ({ children }) => {
-  const token = localStorage.getItem('bd_token');
-  return token ? children : <Navigate to="/signin" replace />;
-};
+function ProtectedRoute({ children }) {
+  return localStorage.getItem('token') ? children : <Navigate to="/login" replace />;
+}
 
-export default function App() {
+function App() {
   return (
-    <BrowserRouter>
+    <Router>
       <Routes>
-        <Route path="/"        element={<Navigate to="/signin" replace />} />
-        <Route path="/signin"  element={<SignIn />} />
-        <Route path="/signup"  element={<SignUp />} />
+        <Route path="/"          element={<LandingPage />} />
+        <Route path="/login"     element={<LoginPage />} />
+        <Route path="/signup"    element={<SignupPage />} />
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-        <Route path="/train"     element={<ProtectedRoute><TrainModel /></ProtectedRoute>} />
-        <Route path="/predict"   element={<ProtectedRoute><PredictDemand /></ProtectedRoute>} />
-        <Route path="/history"   element={<ProtectedRoute><History /></ProtectedRoute>} />
-        <Route path="*"          element={<Navigate to="/signin" replace />} />
+        <Route path="*"          element={<Navigate to="/" replace />} />
       </Routes>
-    </BrowserRouter>
+    </Router>
   );
 }
+
+export default App;

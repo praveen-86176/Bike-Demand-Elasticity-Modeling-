@@ -1,7 +1,18 @@
-from sqlalchemy import Column, Integer, Float, Text, DateTime
+from sqlalchemy import Column, Integer, Float, Text, DateTime, String, UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.sql import func
 from .database import Base
+
+
+class User(Base):
+    __tablename__ = "users"
+
+    id         = Column(Integer, primary_key=True, index=True)
+    name       = Column(Text, nullable=False)
+    email      = Column(String(255), nullable=False, unique=True, index=True)
+    password   = Column(Text, nullable=False)          # bcrypt hash
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
 
 class TrainingRun(Base):
     __tablename__ = "training_runs"
@@ -13,7 +24,9 @@ class TrainingRun(Base):
     mae                = Column(Float)
     r2_score           = Column(Float)
     feature_importance = Column(JSONB)
+    dataset_type       = Column(String(20), server_default='hourly') # 'hourly' or 'daily'
     model_path         = Column(Text)
+
 
 class Prediction(Base):
     __tablename__ = "predictions"

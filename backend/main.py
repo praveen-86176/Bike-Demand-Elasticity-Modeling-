@@ -1,21 +1,23 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from backend.routes import train, predict, history
-from backend.db.database import engine, Base
+from backend.routes import train, predict, history, auth
 
-app = FastAPI(title="Bike Demand Elasticity API")
+app = FastAPI(title="ElasticityAI API", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+app.include_router(auth.router,    prefix="/auth",    tags=["Auth"])
 app.include_router(train.router,   prefix="/train",   tags=["Training"])
 app.include_router(predict.router, prefix="/predict", tags=["Prediction"])
 app.include_router(history.router, prefix="/runs",    tags=["History"])
 
+
 @app.get("/health")
 async def health():
-    return {"status": "ok"}
+    return {"status": "ok", "version": "1.0.0"}

@@ -19,7 +19,8 @@ async def get_runs(db: AsyncSession = Depends(get_db)):
             rmse          = r.rmse,
             mae           = r.mae,
             r2_score      = r.r2_score,
-            features_used = r.features_used
+            features_used = r.features_used,
+            dataset_type  = r.dataset_type
         ) for r in runs
     ]
 
@@ -37,5 +38,6 @@ async def get_run(run_id: int, db: AsyncSession = Depends(get_db)):
         r2_score           = run.r2_score,
         features_used      = run.features_used,
         feature_importance = run.feature_importance,
+        dataset_type       = run.dataset_type,
         model_path         = run.model_path
     )

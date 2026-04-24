@@ -4,26 +4,21 @@ from datetime import datetime
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
-from .preprocess import build_preprocessor, ALL_FEATURES, TARGET
+from .preprocess import build_preprocessor, TARGET
 
 MODELS_DIR = "models"
 os.makedirs(MODELS_DIR, exist_ok=True)
 
 def train_model(df, feature_cols=None):
-    if feature_cols is None:
-        feature_cols = ALL_FEATURES
+    # Dynamically build preprocessor and get effective feature columns
+    preprocessor, effective_features = build_preprocessor(df, feature_cols)
 
-    # Filter only available columns
-    feature_cols = [f for f in feature_cols if f in df.columns]
-
-    X = df[feature_cols]
+    X = df[effective_features]
     y = df[TARGET]
 
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42
     )
-
-    preprocessor = build_preprocessor()
 
     pipeline = Pipeline(steps=[
         ("preprocessor", preprocessor),
@@ -41,4 +36,4 @@ def train_model(df, feature_cols=None):
     model_path = os.path.join(MODELS_DIR, f"rf_model_{timestamp}.pkl")
     joblib.dump(pipeline, model_path)
 
-    return pipeline, X_test, y_test, model_path, feature_cols
+    return pipeline, X_test, y_test, model_path, effective_features

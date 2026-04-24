@@ -1,6 +1,22 @@
-backend/.env
-saved_models/
-test_db.py
+# Environment
+.env
 venv/
 
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Models (large binary files)
 models/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node
+frontend/node_modules/
+frontend/build/
+
+# Logs
+*.log
