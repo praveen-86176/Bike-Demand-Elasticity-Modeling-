@@ -37,6 +37,11 @@ async def train(
         if not selected_features:
             selected_features = None  # fall back to auto-detect
 
+    # OPTIMIZATION: If dataset is too large (like hour.csv), sample it
+    # This prevents Render from timing out or running out of memory
+    if len(df) > 5000:
+        df = df.sample(n=5000, random_state=42)
+
     try:
         pipeline, X_test, y_test, model_path, feature_cols = train_model(df, feature_cols=selected_features)
         rmse, mae, r2 = evaluate_model(pipeline, X_test, y_test)
