@@ -1,14 +1,80 @@
-# Bike Demand Elasticity Modeling API 🚲
+# 🚲 ElasticityAI: Bike Demand Forecasting
 
-This project implements a complete, production-ready machine learning pipeline and REST API for predicting hourly bike rental demand. It trains a robust **Random Forest Regressor** on the open-source **UCI Bike Sharing Dataset** and wraps the inference pipeline within a highly concurrent **FastAPI** backend, automatically logging model metrics to an asynchronous **PostgreSQL** database.
+[![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=flat&logo=fastapi)](https://fastapi.tiangolo.com/)
+[![React](https://img.shields.io/badge/React-20232A?style=flat&logo=react)](https://reactjs.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-336791?style=flat&logo=postgresql)](https://www.postgresql.org/)
+[![Scikit-Learn](https://img.shields.io/badge/scikit--learn-F7931E?style=flat&logo=scikit-learn)](https://scikit-learn.org/)
+
+**ElasticityAI** is a premium, full-stack machine learning platform designed to model and predict bike-sharing demand elasticity. It combines a robust **Random Forest** regression pipeline with a high-performance **FastAPI** backend and a stunning **React** dashboard featuring glassmorphism design and real-time analytics.
+
+---
 
 ## 🚀 Key Features
 
-* **End-to-End ML Pipeline**: Seamless integration of data cleaning, pipeline-based feature engineering (OneHotEncoding + StandardScaler), training, and evaluation.
-* **Feature Importance**: Calculates model-agnostic permutation importance on a 20% hold-out test set during training.
-* **FastAPI Backend**: Extremely fast asynchronous web server exposing cleanly abstracted HTTP endpoints for training, prediction, and history lookup.
-* **Persistent Training History**: Automatically writes regression metrics (RMSE, MAE, R²), serialised `.pkl` artifact paths, and feature permutations to an async PostgreSQL database (`bikedb`).
-* **Pydantic Validation**: Strong compile-time API request/response typing and schema validation using Pydantic v2.
+*   **End-to-End ML Pipeline**: Seamless integration of data cleaning, pipeline-based feature engineering (OneHotEncoding + StandardScaler), training, and evaluation.
+*   **Dynamic Feature Selection**: Automatically filters user-selected features against uploaded datasets (`hour.csv` vs `day.csv`) to ensure zero-crash training.
+*   **Premium Dashboard**: Modern React interface with glassmorphism effects, smooth animations, and a responsive sidebar.
+*   **Real-time Analytics**: Interactive visualizations for seasonal demand trends, weather impact analysis, and model performance metrics.
+*   **Persistent Model Management**: Automatically logs training metrics (RMSE, MAE, R²) and serializes model artifacts to disk.
+*   **Demand Forecasting**: Instant hourly or daily predictions based on weather conditions and calendar features.
+
+---
+
+## 🏗️ Project Architecture
+
+```mermaid
+graph TD
+    subgraph Frontend["🎨 Frontend (React 19)"]
+        LP["Landing Page"]
+        AUTH["Auth (JWT)"]
+        DASH["Dashboard"]
+        DASH --> OV["Overview"]
+        DASH --> PR["Predict"]
+        DASH --> TR["Train"]
+        DASH --> HI["History"]
+        DASH --> AN["Analytics"]
+    end
+
+    subgraph Backend["⚡ Backend (FastAPI)"]
+        API["API Router"]
+        API --> A1["POST /auth/register"]
+        API --> A2["POST /auth/login"]
+        API --> A3["POST /train"]
+        API --> A4["POST /predict"]
+        API --> A5["GET /runs"]
+    end
+
+    subgraph ML_Pipeline["🧠 ML Pipeline (Scikit-Learn)"]
+        PRE["Preprocessor<br/>(ColumnTransformer)"]
+        RF["Random Forest<br/>Regressor"]
+        EV["Evaluator<br/>(RMSE, MAE, R²)"]
+    end
+
+    subgraph Storage["💾 Storage Layer"]
+        PG["PostgreSQL<br/>(Users, Runs, Preds)"]
+        DISK["Disk Storage<br/>(models/*.pkl)"]
+    end
+
+    Frontend -->|"HTTP (JWT)"| Backend
+    A3 --> ML_Pipeline
+    ML_Pipeline --> Storage
+    A4 --> DISK
+    A5 --> PG
+```
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology | Purpose |
+| :--- | :--- | :--- |
+| **Frontend** | React 19, React Router 7 | SPA with glassmorphism UI |
+| **Styling** | Vanilla CSS3 | Custom design system with animations |
+| **API** | FastAPI (Async) | High-concurrency REST endpoints |
+| **Database** | PostgreSQL | Persistent metadata storage |
+| **ML Engine** | Scikit-Learn, Pandas | Training & Preprocessing |
+| **Auth** | JWT, Bcrypt | Secure user authentication |
+| **ORM** | SQLAlchemy 2.0 (Async) | Asynchronous database interactions |
 
 ---
 
@@ -16,103 +82,60 @@ This project implements a complete, production-ready machine learning pipeline a
 
 ```text
 Bike-Demand-Elasticity-Modeling-/
-├── README.md               # You are here
-├── test_db.py              # Rapid asyncpg database connectivity tester
-├── hour.csv                # UCI Bike Sharing hourly dataset
-├── day.csv                 # UCI Bike Sharing daily dataset
-├── requirements.txt        # High-level Python dependencies
-├── backend/
-│   ├── main.py             # FastAPI entry point & Uvicorn router registration
-│   ├── schemas.py          # Pydantic v2 schemas for all API payloads
-│   ├── .env                # Runtime environment variables (Git-ignored)
-│   ├── .env.example        # Safe `.env` placeholder template
-│   ├── db/
-│   │   ├── database.py     # SQLAlchemy Async engine / session factory
-│   │   └── models.py       # SQLAlchemy ORM schemas (`training_runs`, `predictions`)
-│   ├── ml/
-│   │   ├── preprocess.py   # Sklearn ColumnTransformer & Pandas data cleaners
-│   │   ├── model.py        # Pipeline builder & joblib saver/loader
-│   │   └── evaluate.py     # RMSE, MAE, R², and Permutation Importance logic
-│   └── routes/
-│       ├── train.py        # POST /train endpoint
-│       ├── predict.py      # POST /predict endpoint
-│       └── history.py      # GET /runs & GET /runs/{run_id} endpoints
+├── backend/                # FastAPI Application
+│   ├── db/                 # Database models & sessions
+│   ├── ml/                 # ML pipeline (Preprocess, Train, Eval)
+│   ├── routes/             # API endpoint handlers
+│   └── main.py             # App entry point
+├── frontend/               # React Application
+│   ├── src/
+│   │   ├── pages/          # Dashboard & Auth views
+│   │   ├── api.js          # Centralized API client
+│   │   └── index.css       # Premium Design System
+├── data/                   # Dataset storage (hour.csv, day.csv)
+├── models/                 # Serialized model artifacts (.pkl)
+├── eda_plots/              # EDA visualization outputs
+└── BikeRentalModel.ipynb   # Exploratory Data Analysis Notebook
 ```
 
 ---
 
-## 🛠 Prerequisites & Installation
+## 🏁 Getting Started
 
-### 1. Database Setup (PostgreSQL)
-Ensure you have PostgreSQL@15 installed (e.g. via Homebrew on macOS). Start the service and create the required user and database credentials:
-
+### 1. Database Setup
+Ensure PostgreSQL is running and create the database:
 ```sql
 CREATE USER bikeuser WITH PASSWORD 'bike1234';
 CREATE DATABASE bikedb OWNER bikeuser;
-GRANT ALL PRIVILEGES ON DATABASE bikedb TO bikeuser;
 ```
 
-### 2. Environment Variables
-Copy the `.env.example` placeholder inside the `backend/` directory to `.env`:
+### 2. Backend Setup
 ```bash
-cp backend/.env.example backend/.env
-```
-Ensure that `backend/.env` maps exactly to the database credentials above:
-```properties
-DATABASE_URL=postgresql+asyncpg://bikeuser:bike1234@localhost:5432/bikedb
-```
-
-### 3. Virtual Environment & Dependencies
-This project is built for **Python 3.13+**. Set up a clean virtual environment and install the dependencies:
-
-```bash
-python3.13 -m venv venv
+python3 -m venv venv
 source venv/bin/activate
-pip install -r requirements.txt 
+pip install -r requirements.txt
+# Configure backend/.env with your DATABASE_URL
+python3 -m uvicorn backend.main:app --reload --port 8001
 ```
-*(Or manually install the explicit dependencies shown in the `venv` context if a lockfile is missing).*
 
----
-
-## 🏃 Running the API
-
-Export your PostgreSQL path (if on macOS Homebrew) and start the Uvicorn ASGI server:
-
+### 3. Frontend Setup
 ```bash
-export PATH="/opt/homebrew/opt/postgresql@15/bin:$PATH"
-python3 -m uvicorn backend.main:app --reload --port 8000
+cd frontend
+npm install
+npm start
 ```
 
-The interactive **Swagger UI** will be available at:
-👉 **http://127.0.0.1:8000/docs**
+---
+
+## 📡 API Endpoints
+
+*   `POST /train`: Upload CSV and train a new model.
+*   `POST /predict`: Generate demand forecast from features.
+*   `GET /runs`: List all historical training runs and metrics.
+*   `POST /auth/register`: Create a new user account.
+*   `POST /auth/login`: Authenticate and receive JWT token.
 
 ---
 
-## 📡 API Endpoints 
-
-### `POST /train`
-Upload a raw CSV (e.g. `hour.csv`). The endpoint cleans the dataset, applies one-hot-encoding/scaling, fits a Random Forest, evaluates it on a 20% validation split, serialises the artifact to `models/`, and saves the run metadata to Postgres.
-* **Input**: `multipart/form-data` file upload.
-* **Output**: RMSE, MAE, R², and dict of feature importance.
-
-### `POST /predict`
-Submit weather conditions to execute inference against the newest saved `.pkl` model.
-* **Input**: JSON payload containing `temp`, `atemp`, `hum`, `windspeed`, `holiday`, `season`, etc.
-* **Output**: Predicted `int` hourly bike demand.
-
-### `GET /runs`
-Paginated view displaying historical training runs and their top-level metrics.
-* **Output**: A lightweight JSON array mapping directly back to PostgreSQL `training_runs` records.
-
-### `GET /runs/{run_id}`
-Returns a deep dive into an explicit training run, containing specific UUIDs, the physical absolute `.pkl` disk path, and granular permutation importance data.
-
-### `GET /health`
-Liveness probe.
-
----
-
-## 🔒 Notes on Artifact Storage
-Trained `.pkl` outputs exceed **~115+ MB**! For this reason, the local pipeline saves artifacts straight into a dynamically generated `models/` directory.
-
-> **Note**: `models/` is actively ignored heavily in `.gitignore` to prevent GitHub's 100MB blob-size blockers and Git-LFS headaches. Keep your `.pkl` artifacts local!
+## 📜 License
+This project is licensed under the MIT License.
