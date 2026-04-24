@@ -4,7 +4,12 @@
  * Base URL: http://localhost:8000
  */
 
-const BASE = '/api';
+// Runtime environment detection — no env vars, no proxy, no restart needed
+// Local dev → calls backend directly on port 8001
+// Netlify production → uses relative /api path (handled by _redirects proxy)
+const BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? 'http://localhost:8001/api'
+  : '/api';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
