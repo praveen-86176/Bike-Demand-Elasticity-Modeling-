@@ -1,14 +1,17 @@
 /**
  * src/api.js
  * Centralised Axios-free API client for the FastAPI backend.
- * Base URL: http://localhost:8000
+ *
+ * Priority order for the backend URL:
+ *  1. REACT_APP_API_URL env variable (set in frontend/.env)
+ *  2. http://localhost:8000 for local development
  */
 
-// Local dev → calls backend directly on port 8001
-// Production → calls Render backend directly (CORS enabled)
-const BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-  ? 'http://localhost:8000/api'
-  : 'https://bike-demand-elasticity-modeling.onrender.com/api';
+// Reads from frontend/.env → REACT_APP_API_URL=https://your-ec2-domain.com
+// Falls back to localhost for local dev if env var not set.
+const BASE = process.env.REACT_APP_API_URL
+  ? `${process.env.REACT_APP_API_URL}/api`
+  : 'http://localhost:8000/api';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 

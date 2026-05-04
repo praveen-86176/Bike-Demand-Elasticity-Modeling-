@@ -1,2 +1,1 @@
-# SPA Routing - Fixes 404 errors on page refresh (Required for Netlify)
-/*      /index.html  200
+/*    /index.html   200
