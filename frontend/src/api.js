@@ -7,7 +7,7 @@
 // Local dev → calls backend directly on port 8001
 // Production → calls Render backend directly (CORS enabled)
 const BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-  ? 'http://localhost:8001/api'
+  ? 'http://localhost:8000/api'
   : 'https://bike-demand-elasticity-modeling.onrender.com/api';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -120,28 +120,55 @@ export const predictApi = {
 // ── Training runs ─────────────────────────────────────────────────────────────
 
 export const runsApi = {
-  list:   ()        => get('/runs'),
-  detail: (id)      => get(`/runs/${id}`),
-  
-  train: (file, features) => {
+  list:   ()   => get('/runs'),
+  detail: (id) => get(`/runs/${id}`),
+
+  /** Train a model. Optionally enable GridSearchCV (tune) and multi-model comparison. */
+  train: (file, features, tune = false, compare = false) => {
     const formData = new FormData();
     formData.append('file', file);
-    if (features) {
-      formData.append('features', JSON.stringify(features));
-    }
-    
+    if (features) formData.append('features', JSON.stringify(features));
+    formData.append('tune',    tune    ? 'true' : 'false');
+    formData.append('compare', compare ? 'true' : 'false');
+
     return fetch(`${BASE}/train`, {
       method: 'POST',
       headers: authHeaders(),
       body: formData,
-    }).then(res => {
-      if (!res.ok) throw new Error('Training failed');
-      return res.json();
+    }).then(async res => {
+      let data;
+      try { data = await res.json(); } catch { data = {}; }
+      if (!res.ok) throw new Error(data.detail || `Training failed (HTTP ${res.status})`);
+      return data;
     });
-  }
+  },
+
+  /** Get comparison + SHAP + CV data for a specific run. */
+  getComparison: (runId) => get(`/runs/${runId}/comparison`),
+
+  /**
+   * Download a performance report for a run.
+   * format: 'json' | 'csv'  — triggers a browser file download.
+   */
+  downloadReport: (runId, format = 'json') => {
+    const token = localStorage.getItem('token');
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+    return fetch(`${BASE}/runs/${runId}/report?format=${format}`, { headers })
+      .then(async res => {
+        if (!res.ok) throw new Error(`Report download failed (HTTP ${res.status})`);
+        const blob = await res.blob();
+        const url  = URL.createObjectURL(blob);
+        const a    = document.createElement('a');
+        a.href     = url;
+        a.download = `run_${runId}_report.${format}`;
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+  },
 };
 
 
-// ── Health ────────────────────────────────────────────────────────────────────
+// ── Health ───────────────────────────────────────────────────────────────────
 
 export const healthCheck = () => get('/health');
+

@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from backend.routes import train, predict, history, auth
+from backend.routes import train, predict, history, auth, advanced
 from backend.db.database import engine, Base
 
 app = FastAPI(title="ElasticityAI API", version="1.0.0")
@@ -19,10 +19,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(auth.router,    prefix="/api/auth",    tags=["Auth"])
-app.include_router(train.router,   prefix="/api/train",   tags=["Training"])
-app.include_router(predict.router, prefix="/api/predict", tags=["Prediction"])
-app.include_router(history.router, prefix="/api/runs",    tags=["History"])
+app.include_router(auth.router,     prefix="/api/auth",    tags=["Auth"])
+app.include_router(train.router,    prefix="/api/train",   tags=["Training"])
+app.include_router(predict.router,  prefix="/api/predict", tags=["Prediction"])
+app.include_router(history.router,  prefix="/api/runs",    tags=["History"])
+app.include_router(advanced.router, prefix="/api/runs",    tags=["Advanced"])  # report + comparison
 
 
 @app.get("/health")
