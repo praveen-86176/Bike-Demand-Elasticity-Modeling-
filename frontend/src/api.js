@@ -1,18 +1,14 @@
 /**
  * src/api.js
  * Centralised Axios-free API client for the FastAPI backend.
- *
- * Local dev:   REACT_APP_API_URL=http://localhost:8000 (in frontend/.env)
- * Netlify:     REACT_APP_API_URL not set → uses relative '/api' path.
- *              netlify.toml proxies /api/* → http://32.192.164.156/api/* (EC2 via nginx on port 80)
- *              This avoids HTTPS→HTTP mixed content errors in the browser.
+ * Base URL: http://localhost:8000
  */
 
-// If env var is set, use it directly (local dev pointing to EC2 or localhost).
-// If not set (Netlify production build), use relative path — netlify.toml proxy handles the routing.
-const BASE = process.env.REACT_APP_API_URL
-  ? `${process.env.REACT_APP_API_URL}/api`
-  : '/api';
+// Local dev → calls backend directly on port 8001
+// Production → calls Render backend directly (CORS enabled)
+const BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? 'http://localhost:8000/api'
+  : 'https://bike-demand-elasticity-modeling.onrender.com/api';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
