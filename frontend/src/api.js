@@ -1,17 +1,10 @@
 /**
  * src/api.js
- * Centralised Axios-free API client for the FastAPI backend.
- *
- * Priority order for the backend URL:
- *  1. REACT_APP_API_URL env variable (set in frontend/.env)
- *  2. http://localhost:8000 for local development
+ * Centralised API client for the FastAPI backend.
  */
 
-// Reads from frontend/.env → REACT_APP_API_URL=https://your-ec2-domain.com
-// Falls back to localhost for local dev if env var not set.
-const BASE = process.env.REACT_APP_API_URL
-  ? `${process.env.REACT_APP_API_URL}/api`
-  : 'http://localhost:8000/api';
+// Production Backend URL (AWS EC2 via DuckDNS)
+const BASE = 'https://bikedemand-api.duckdns.org/api';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
